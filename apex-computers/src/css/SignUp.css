@@ -1,0 +1,93 @@
+.signup_bg {
+    background-image: url("../../public/images/signUp_Bg.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100vh;
+}
+
+.container2 {
+    width: 70%;
+    height: 85%;
+    border-radius: 10px;
+}
+
+.main-content2 {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.section2_1 {
+    width: 50%;
+    height: 100%;
+    padding: 12px 0px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    background-color: #D9D9D9;
+    opacity: 0.75;
+    border: 1px solid rgba(54, 177, 230, 0.5);
+}
+
+.section2_2 {
+    width: 50%;
+    height: 100%;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    background-color: #1D455B;
+    opacity: 0.9;
+}
+
+.about-imgView2 {
+    background-image: url("../../public/images/gaming.jfif");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    opacity: 0.6;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.apex-logo2 {
+    width: 120px;
+    height: 120px;
+    background-image: url("../../public/images/Apex_Logo.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.input-container2 {
+    display: flex;
+    align-items: center;
+    background-color: #d3e7f6;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    border: 1px solid #ccc;
+    column-gap: 5px;
+}
+
+.input-container2 input {
+    border: none;
+    background: transparent;
+    outline: none;
+    flex-grow: 1;
+    color: #333;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.input-container2 input::placeholder {
+    color: #6d8091;
+}
+
+.signupBtn:hover {
+    background-color: #08394F;
+    transition: 0.45s all ease-in-out;
+    scale: 1.015;
+}
