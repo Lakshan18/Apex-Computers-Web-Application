@@ -1,4 +1,4 @@
-import { React, useEffect, useState } from 'react';
+import { React, useEffect, useRef, useState } from 'react';
 import '../App.css';
 import NavBar from '../components/NavBar';
 import { useNavigate } from 'react-router-dom';
@@ -14,25 +14,6 @@ const Home = () => {
 
     const goToCart = () => {
         navigate("/cart");
-    }
-
-    const checkSigning = async () => {
-        const response = await fetch("http://localhost:8080/apex_computer/CheckSignIn");
-
-        if (response.ok) {
-            const json = await response.json();
-
-            const response_DTO = json.respDTO;
-
-            if (response_DTO.success) {
-            
-                //sign in done....
-
-                const user = response_DTO.content;
-
-                
-            }
-        }
     }
 
     const slides = [
@@ -168,6 +149,21 @@ const Home = () => {
             available: "IN-STOCK",
         },
     ];
+
+    const sliderRef = useRef(null);
+
+    const handleScroll = (direction) => {
+        const cardWidth = sliderRef.current.children[0].offsetWidth; // Get the width of a single card
+        const gapWidth = 16; // Gap between cards (in pixels)
+        const scrollAmount = cardWidth + gapWidth; // Total scroll for one card
+
+        if (direction === "left") {
+            sliderRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+        } else {
+            sliderRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+        }
+    };
+
 
     // services icon.........
 
@@ -385,38 +381,83 @@ const Home = () => {
                         {collectionCard}
                     </div>
                 </div>
-                <div className='main-container'>
-                    <div className='w-[95%] h-auto'>
-                        <div className='w-[100%] h-auto flex flex-row justify-between items-center my-[1.5%]' style={{ borderBottom: '2px solid #7E9DA6' }}>
-                            <span className='text-[#fff] text-heading-txt font-[Inter]' style={{ borderBottom: '2px solid #00C2FF' }}>Top Products</span>
-                            <div className='inline-flex gap-x-14'>
-                                <span className='text-[#fff] text-large-txt font-[Inter] cursor-pointer'>Featured</span>
-                                <span className='text-[#fff] text-large-txt font-[Inter] cursor-pointer'>Latest</span>
-                                <span className='text-[#fff] text-large-txt font-[Inter] cursor-pointer'>Best Sellers</span>
+                <div className="main-container bg-[#1F2B33] py-6 px-4">
+                    <div className="w-[95%] mx-auto overflow-hidden">
+                        {/* Header Section */}
+                        <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-[#7E9DA6]">
+                            <span
+                                className="text-[#fff] text-xl font-semibold"
+                                style={{ borderBottom: "2px solid #00C2FF" }}
+                            >
+                                Top Products
+                            </span>
+                            <div className="flex gap-x-10">
+                                <span className="text-[#fff] text-lg cursor-pointer">Featured</span>
+                                <span className="text-[#fff] text-lg cursor-pointer">Latest</span>
+                                <span className="text-[#fff] text-lg cursor-pointer">Best Sellers</span>
                             </div>
                         </div>
-                        <div className='flex flex-row justify-center'>
-                            <div className='w-auto h-auto grid lg:grid-cols-5 md:grid-cols-3 sm:grid-cols-1 grid-rows-2 gap-8'>
 
+                        {/* Slider Section */}
+                        <div className="relative">
+                            {/* Left Button */}
+                            <button
+                                onClick={() => handleScroll("left")}
+                                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-[#00C2FF] text-white p-3 rounded-full shadow-lg z-10 hover:bg-[#009ACE]"
+                            >
+                                &#8249;
+                            </button>
+
+                            {/* Slider */}
+                            <div
+                                ref={sliderRef}
+                                className="flex overflow-x-auto no-scrollbar gap-x-4 scroll-smooth"
+                            >
                                 {topProducts.map((product) => (
-                                    <div className='card-box flex flex-col cursor-pointer' onClick={singleProductView}>
-                                        <span className='text-[#C2CBCE] font-[Inter] text-[11px] text-end font-normal'>{product.category}</span>
-                                        <div className='w-[100%] h-auto flex flex-col items-center'>
-                                            <div className='card-img-area mt-2'>
-                                                <img src={product.image} className='card-img' alt="" />
+                                    <div
+                                        key={product.pid}
+                                        className="w-[300px] flex-shrink-0 bg-gradient-to-br from-[#2B3740] to-[#1F2B33] p-4 rounded-lg shadow-lg relative"
+                                    >
+                                        <span className="text-[#C2CBCE] font-medium text-sm block mb-2 text-right">
+                                            {product.category}
+                                        </span>
+                                        <div className="flex flex-col items-center">
+                                            <div className="card-img-area mb-4">
+                                                <img
+                                                    src={product.image}
+                                                    alt={product.pr_title}
+                                                    className="rounded-md object-cover"
+                                                />
                                             </div>
-                                            <span className='text-center my-[8%] text-[#97E6FF] text-medium-txt font-[Inter] font-semibold'>{product.pr_title}</span>
+                                            <span className="text-[#97E6FF] text-lg font-semibold text-center">
+                                                {product.pr_title}
+                                            </span>
                                         </div>
-                                        <div className='flex flex-col justify-center px-[3%] pb-[2%]'>
-                                            <span className='text-[#e1e4e5] font-[Inter] font-medium'>Rs: {product.price}.00</span>
-                                            <span className={`text-small-txt font-[Inter] font-medium mt-2 ${product.available === "IN-STOCK" ? 'text-[#4FF974]' : 'text-[#e33d3d]'}`}>{product.available}</span>
+                                        <div className="mt-4">
+                                            <span className="block text-[#e1e4e5] font-medium">
+                                                Rs: {product.price}.00
+                                            </span>
+                                            <span
+                                                className={`block mt-2 font-medium ${product.available === "IN-STOCK"
+                                                        ? "text-[#4FF974]"
+                                                        : "text-[#e33d3d]"
+                                                    }`}
+                                            >
+                                                {product.available}
+                                            </span>
                                         </div>
                                     </div>
-
                                 ))}
                             </div>
-                        </div>
 
+                            {/* Right Button */}
+                            <button
+                                onClick={() => handleScroll("right")}
+                                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-[#00C2FF] text-white p-3 rounded-full shadow-lg z-10 hover:bg-[#009ACE]"
+                            >
+                                &#8250;
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div className='main-container'>
