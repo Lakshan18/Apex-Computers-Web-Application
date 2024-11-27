@@ -26,7 +26,7 @@ function SignUp() {
 
     const signUpProcess = async () => {
 
-        const response = await fetch("http://localhost:8080/apex_computer/User_Register",
+        const response = await fetch("http://localhost:8080/Apex_Computer-Backend/User_Register",
             {
                 method: "POST",
                 body: JSON.stringify(userDTO),
@@ -88,7 +88,7 @@ function SignUp() {
             alert("invalid v Code");
         } else {
 
-            const response = await fetch("http://localhost:8080/apex_computer/Verify_Account",
+            const response = await fetch("http://localhost:8080/Apex_Computer-Backend/Verify_Account",
                 {
                     method: "POST",
                     body: JSON.stringify(codeObj),

@@ -37,6 +37,7 @@ public class Verify_Account extends HttpServlet {
         JsonObject jsonObject = gson.fromJson(req.getReader(), JsonObject.class);
         String verification_code = jsonObject.get("v_code").getAsString();
 
+        System.out.println(req.getSession().getAttribute("email"));
         if (req.getSession().getAttribute("email") != null) {
             String email = req.getSession().getAttribute("email").toString();
 

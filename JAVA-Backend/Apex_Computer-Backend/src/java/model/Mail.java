@@ -12,7 +12,7 @@ import javax.mail.internet.MimeMessage;
 public class Mail {
 
     private static final String APP_EMAIL = "lakshanvlogs3276@gmail.com";
-    private static final String APP_PASSWORD = "vgvrcbrmzpevthcz";
+    private static final String APP_PASSWORD = "nxmgfhabhfxajjoi"; // Use an App Password here
 
     public static void sendMail(String email, String subject, String htmlContent) {
 
@@ -22,6 +22,7 @@ public class Mail {
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
         props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2"); // Ensure compatibility with modern TLS
 
         Session session = Session.getInstance(props,
                 new javax.mail.Authenticator() {
@@ -29,6 +30,8 @@ public class Mail {
                 return new PasswordAuthentication(Mail.APP_EMAIL, Mail.APP_PASSWORD);
             }
         });
+
+        session.setDebug(true); // Enable debug logs
 
         try {
             Message message = new MimeMessage(session);

@@ -240,7 +240,7 @@ const Home = () => {
     // }, []);
 
     const checkSigning = async () => {
-        const response = await fetch("http://localhost:8080/apex_computer/CheckSignIn",
+        const response = await fetch("http://localhost:8080/Apex_Computer-Backend/CheckSignIn",
             {
                 method: "GET",
                 headers: {
