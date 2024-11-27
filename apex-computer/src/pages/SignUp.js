@@ -83,9 +83,9 @@ function SignUp() {
     const verifyAccount = async () => {
 
         if (vCode.length === 0) {
-            alert("please enter your verification code");
+            alert("please enter your v Code");
         } else if (vCode.length < 5) {
-            alert("invalid verification code");
+            alert("invalid v Code");
         } else {
 
             const response = await fetch("http://localhost:8080/apex_computer/Verify_Account",

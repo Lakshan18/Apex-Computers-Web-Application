@@ -1,26 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import '../App.css';
 import { Link } from 'react-router-dom';
 
 function NavBar() {
-
+    
     const checkSigning = async () => {
-        const response = await fetch("http://localhost:8080/apex_computer/CheckSignIn");
+        const response = await fetch("http://localhost:8080/apex_computer/CheckSignIn",
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
 
         if (response.ok) {
-            const json = await response.json();
-
-            const response_DTO = json.respDTO;
-
-            if (response_DTO.success) {
-
-                //sign in done....
-
-                const user = response_DTO.content;
-                alert(user);
-            }
-
-           console.log(response_DTO);
+            const respObj = await response.json();
+            console.log(respObj);
+        } else {
+            console.log(response);
         }
     }
 

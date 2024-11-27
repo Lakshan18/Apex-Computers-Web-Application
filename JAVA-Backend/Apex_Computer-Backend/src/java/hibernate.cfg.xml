@@ -10,6 +10,14 @@
         <property name="hibernate.connection.password">Sadeepa1818.</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
         <property name="hibernate.show_sql">true</property>   
-        <!--<mapping class="entity.User" />-->  
+        <mapping class="entity.User" />        
+        <mapping class="entity.Product" />  
+        <mapping class="entity.Product_Condition" />  
+        <mapping class="entity.Product_Status" />  
+        <mapping class="entity.Brand" />  
+        <mapping class="entity.Model" />        
+        <mapping class="entity.Color" />  
+        <mapping class="entity.City" />  
+        <mapping class="entity.Category" />  
     </session-factory>
 </hibernate-configuration>

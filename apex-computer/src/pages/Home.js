@@ -8,9 +8,9 @@ const Home = () => {
 
     const navigate = useNavigate();
 
-    const singleProductView = () => {
-        navigate("/singleProductView");
-    };
+    // const singleProductView = () => {
+    //     navigate("/singleProductView");
+    // };
 
     const goToCart = () => {
         navigate("/cart");
@@ -53,7 +53,7 @@ const Home = () => {
         }, 5000); // Change slide every 3 seconds
 
         return () => clearInterval(slideInterval); // Cleanup on unmount
-    }, []);
+    });
 
     // Handle slide change with fade animation
     const goNextSlide = () => {
@@ -153,9 +153,8 @@ const Home = () => {
     const sliderRef = useRef(null);
 
     const handleScroll = (direction) => {
-        const cardWidth = sliderRef.current.children[0].offsetWidth; // Get the width of a single card
-        const gapWidth = 16; // Gap between cards (in pixels)
-        const scrollAmount = cardWidth + gapWidth; // Total scroll for one card
+        const cardWidth = sliderRef.current.children[0].offsetWidth; // Get the width of a single card (including gap)
+        const scrollAmount = cardWidth * 5; // Scroll 5 cards at a time
 
         if (direction === "left") {
             sliderRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
@@ -163,7 +162,6 @@ const Home = () => {
             sliderRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
         }
     };
-
 
     // services icon.........
 
@@ -235,13 +233,40 @@ const Home = () => {
         },
     ];
 
+    // this area used onloading functions
+
+    // useEffect(() => {
+    //     checkSigning();
+    // }, []);
+
+    const checkSigning = async () => {
+        const response = await fetch("http://localhost:8080/apex_computer/CheckSignIn",
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        if (response.ok) {
+            const respObj = await response.json();
+            console.log(respObj);
+        } else {
+            console.log(response);
+        }
+    }
+
+
+    // this area used onloading functions
+
     return (
 
         <>
 
             <NavBar />
 
-            <body className='main-bodyContainer' >  {/*onLoad={checkSigning}*/}
+            <body className='main-bodyContainer'>  {/*onLoad={checkSigning}*/}
 
 
                 <div className='main-container'>
@@ -265,7 +290,7 @@ const Home = () => {
                                 </div>
                             </div>
                             <div className=' flex flex-row items-center'>
-                                <span className='text-medium-txt text-[#CECECE] font-semibold font-[Quicksand] pe-3'> User112@</span>
+                                <span className='text-medium-txt text-[#CECECE] font-semibold font-[Quicksand] pe-3'>Sahan12@</span>
                                 <div className='icon-box'>
                                     <img src="./images/User.png" alt="User-Img" className='icon-view' />
                                 </div>
@@ -381,44 +406,46 @@ const Home = () => {
                         {collectionCard}
                     </div>
                 </div>
-                <div className="main-container bg-[#1F2B33] py-6 px-4">
-                    <div className="w-[95%] mx-auto overflow-hidden">
-                        {/* Header Section */}
-                        <div className="flex justify-between items-center mb-6 pb-2 border-b-2 border-[#7E9DA6]">
-                            <span
-                                className="text-[#fff] text-xl font-semibold"
-                                style={{ borderBottom: "2px solid #00C2FF" }}
-                            >
-                                Top Products
-                            </span>
-                            <div className="flex gap-x-10">
-                                <span className="text-[#fff] text-lg cursor-pointer">Featured</span>
-                                <span className="text-[#fff] text-lg cursor-pointer">Latest</span>
-                                <span className="text-[#fff] text-lg cursor-pointer">Best Sellers</span>
+                <div className='main-container'>
+                    <div className='w-[95%] h-auto'>
+                        <div className='w-[100%] h-auto flex flex-row justify-between items-center my-[1.5%]' style={{ borderBottom: '2px solid #7E9DA6' }}>
+                            <span className='text-[#fff] text-heading-txt font-[Inter]' style={{ borderBottom: '2px solid #00C2FF' }}>Top Products</span>
+                            <div className='inline-flex gap-x-14'>
+                                <span className='text-[#fff] text-large-txt font-[Inter] cursor-pointer'>Featured</span>
+                                <span className='text-[#fff] text-large-txt font-[Inter] cursor-pointer'>Latest</span>
+                                <span className='text-[#fff] text-large-txt font-[Inter] cursor-pointer'>Best Sellers</span>
                             </div>
                         </div>
-
                         {/* Slider Section */}
-                        <div className="relative">
+                        <div className="relative overflow-hidden">
                             {/* Left Button */}
                             <button
                                 onClick={() => handleScroll("left")}
-                                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-[#00C2FF] text-white p-3 rounded-full shadow-lg z-10 hover:bg-[#009ACE]"
+                                className="absolute h-[50px] left-0 top-1/2 transform -translate-y-1/2 bg-[#00C2FF] text-white p-3 rounded-full shadow-lg z-10 hover:bg-[#009ACE]"
                             >
-                                &#8249;
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                                </svg>
                             </button>
 
                             {/* Slider */}
                             <div
                                 ref={sliderRef}
-                                className="flex overflow-x-auto no-scrollbar gap-x-4 scroll-smooth"
+                                className="flex overflow-hidden gap-x-4 scroll-smooth"
+                                style={{
+                                    width: "100%", // Ensure the container fits within the parent
+                                }}
                             >
                                 {topProducts.map((product) => (
                                     <div
                                         key={product.pid}
-                                        className="w-[300px] flex-shrink-0 bg-gradient-to-br from-[#2B3740] to-[#1F2B33] p-4 rounded-lg shadow-lg relative"
+                                        className="flex-shrink-0 w-[calc(20%-1rem)] bg-gradient-to-br from-[#2B3740] to-[#1F2B33] p-4 rounded-lg shadow-lg relative"
+                                        style={{
+                                            minWidth: "calc(20% - 1rem)", // Adjust card width dynamically
+                                            maxWidth: "calc(20% - 1rem)",
+                                        }}
                                     >
-                                        <span className="text-[#C2CBCE] font-medium text-sm block mb-2 text-right">
+                                        <span className="text-[#C2CBCE] font-normal text-[12px] block mb-2 text-right">
                                             {product.category}
                                         </span>
                                         <div className="flex flex-col items-center">
@@ -439,8 +466,8 @@ const Home = () => {
                                             </span>
                                             <span
                                                 className={`block mt-2 font-medium ${product.available === "IN-STOCK"
-                                                        ? "text-[#4FF974]"
-                                                        : "text-[#e33d3d]"
+                                                    ? "text-[#4FF974]"
+                                                    : "text-[#e33d3d]"
                                                     }`}
                                             >
                                                 {product.available}
@@ -453,11 +480,14 @@ const Home = () => {
                             {/* Right Button */}
                             <button
                                 onClick={() => handleScroll("right")}
-                                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-[#00C2FF] text-white p-3 rounded-full shadow-lg z-10 hover:bg-[#009ACE]"
+                                className="absolute h-[50px] right-0 top-1/2 transform -translate-y-1/2 bg-[#00C2FF] text-white p-3 rounded-full shadow-lg z-10 hover:bg-[#009ACE]"
                             >
-                                &#8250;
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                </svg>
                             </button>
                         </div>
+
                     </div>
                 </div>
                 <div className='main-container'>
@@ -552,63 +582,6 @@ const Home = () => {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* <div className="flex justify-center items-center h-screen bg-gray-900 text-white">
-
-<div
-                                    onClick={() => setHandleProduct(productData1, 'from-left')}
-                                    className="w-1/3 cursor-pointer p-4 hover:scale-105 transform transition-all duration-500"
-                                >
-                                    <div className="bg-gray-800 p-6 rounded-lg">
-                                        <h3 className="text-xl font-bold">{productData1.title}</h3>
-                                        <p className="text-blue-400 mt-2">Shop now →</p>
-                                    </div>
-                                </div>
-
-                                <div className={`relative w-1/3 p-4`}>
-                                    <div
-                                        className={`absolute inset-0 bg-gray-700 p-6 rounded-lg transition-transform transition-opacity duration-700 ease-in-out transform ${direction === 'from-left' && activeProduct
-                                                ? 'translate-x-0 opacity-100'
-                                                : direction === 'from-left'
-                                                    ? '-translate-x-12 opacity-0'
-                                                    : ''
-                                            } ${direction === 'from-right' && activeProduct
-                                                ? 'translate-x-0 opacity-100'
-                                                : direction === 'from-right'
-                                                    ? 'translate-x-12 opacity-0'
-                                                    : ''
-                                            }`}
-                                    >
-                                        {activeProduct ? (
-                                            <div className="flex flex-col items-center text-center">
-                                                <img
-                                                    src={activeProduct.image}
-                                                    alt={activeProduct.title}
-                                                    className="w-full h-32 object-cover mb-4"
-                                                />
-                                                <h3 className="text-2xl font-bold">{activeProduct.title}</h3>
-                                                <p className="mt-2">{activeProduct.description}</p>
-                                                <p className="mt-2 font-bold text-blue-300">
-                                                    {activeProduct.price}
-                                                </p>
-                                                <p className="mt-4 text-blue-400">Shop Now →</p>
-                                            </div>
-                                        ) : (
-                                            <div className="text-gray-400">Select a product to view details</div>
-                                        )}
-                                    </div>
-                                </div>
-
-                            <div
-                                onClick={() => setHandleProduct(productData2, 'from-right')}
-                                className="w-1/3 cursor-pointer p-4 hover:scale-105 transform transition-all duration-500"
-                            >
-                                <div className="bg-gray-800 p-6 rounded-lg">
-                                    <h3 className="text-xl font-bold">{productData2.title}</h3>
-                                    <p className="text-blue-400 mt-2">Shop now →</p>
-                                </div>
-                            </div>
-                        </div> */}
 
                         </div>
                     </div>

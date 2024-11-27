@@ -34,10 +34,10 @@ public class User implements Serializable {
     private String password;
 
     @Column(name = "registration_date", nullable = false)
-    private Date registration_date;
+    private String registration_date;
 
-    @Column(name = "verification_code", length = 10, nullable = false)
-    private String verification_code;
+    @Column(name = "verification", length = 10, nullable = false)
+    private String verification;
 
     public User() {
 
@@ -91,20 +91,20 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public Date getRegistration_date() {
+    public String getRegistration_date() {
         return registration_date;
     }
 
-    public void setRegistration_date(Date registration_date) {
+    public void setRegistration_date(String registration_date) {
         this.registration_date = registration_date;
     }
 
-    public String getVerification_code() {
-        return verification_code;
+    public String getVerification() {
+        return verification;
     }
 
-    public void setVerification_code(String verification_code) {
-        this.verification_code = verification_code;
+    public void setVerification(String verification) {
+        this.verification = verification;
     }
 
 }
