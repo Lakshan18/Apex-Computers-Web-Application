@@ -22,36 +22,56 @@ function SignUp() {
         conf_password: coPassword,
     };
 
-    // request process to servlet....
 
     const signUpProcess = async () => {
-
-        const response = await fetch("http://localhost:8080/Apex_Computer-Backend/User_Register",
-            {
+        try {
+            const response = await fetch("http://localhost:8080/apex_comp-backend/User_SignUp", {
                 method: "POST",
                 body: JSON.stringify(userDTO),
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include",
             });
 
-        if (response.ok) {
-            const json = await response.json();
+            if (response.ok) {
+                const json = await response.json();
 
-            if (json.success) {
-                setIsLoading(true);
+                if (json.success) {
+                    setIsLoading(true);
 
-                setTimeout(() => {
-                    setIsLoading(false);
-                    setIsModalOpen(true);
-                }, 6000);
+                    setTimeout(() => {
+                        setIsLoading(false);
+                        setIsModalOpen(true);
+                    }, 2000);
+                } else {
+                    const messageElement = document.getElementById("message");
+                    if (messageElement) {
+                        messageElement.innerHTML = json.content;
+                    } else {
+                        console.error("Message element not found.");
+                    }
+                }
             } else {
-                document.getElementById("message").innerHTML = json.content;
+                const messageElement = document.getElementById("message");
+                if (messageElement) {
+                    messageElement.innerHTML = "Something went wrong. Please try again later!";
+                } else {
+                    console.error("Message element not found.");
+                }
             }
-        } else {
-            document.getElementById("message").innerHTML = "something went wrong. try again later.!!";
-        };
+        } catch (error) {
+            console.error("SignUp process failed:", error);
+
+            const messageElement = document.getElementById("message");
+            if (messageElement) {
+                messageElement.innerHTML = "Network error. Please check your connection.";
+            } else {
+                console.error("Message element not found.");
+            }
+        }
     };
+
 
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -76,38 +96,45 @@ function SignUp() {
 
     const [vCode, setVCode] = useState("");
 
-    const codeObj = {
-        v_code: vCode,
-    };
-
     const verifyAccount = async () => {
-
         if (vCode.length === 0) {
-            alert("please enter your v Code");
-        } else if (vCode.length < 5) {
-            alert("invalid v Code");
-        } else {
+            alert("Please enter your verification code.");
+            return;
+        }
+        if (vCode.length < 5) {
+            alert("Invalid verification code.");
+            return;
+        }
 
-            const response = await fetch("http://localhost:8080/Apex_Computer-Backend/Verify_Account",
-                {
-                    method: "POST",
-                    body: JSON.stringify(codeObj),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
+        try {
+            const codeObj = { v_code: vCode };
+
+            const response = await fetch("http://localhost:8080/apex_comp-backend/Verify_Account", {
+                method: "POST",
+                body: JSON.stringify(codeObj),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include", // Required for cross-origin sessions
+            });
 
             if (response.ok) {
-                const json = response.json();
+                const json = await response.json();
 
-                if (json === "success") {
+                if (json.success) {
                     navigate('/signin');
                 } else {
                     document.getElementById("errorVC").innerHTML = json.content;
                 }
-            };
+            } else {
+                alert("Failed to verify account. Please try again.");
+            }
+        } catch (error) {
+            console.error("Verification failed:", error);
+            alert("An error occurred. Please try again later.");
         }
-    }
+    };
+
 
 
     return (

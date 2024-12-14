@@ -15,19 +15,21 @@ function SignIn() {
   };
 
   const signInProcess = async () => {
-    const response = await fetch("http://localhost:8080/Apex_Computer-Backend/UserSignIn",
+    const response = await fetch("http://localhost:8080/apex_comp-backend/User_Signin",
       {
         method: "POST",
         body: JSON.stringify(userLDetails),
         headers: {
           "Content-Type": "application/json"
-        }
+        },
+        credentials: "include",
       });
 
     if (response.ok) {
       const json = await response.json();
 
       if (json.success) {
+        localStorage.setItem('firstLogin', 'true');
         setTimeout(() => {
           navigate('/');
         }, 800);

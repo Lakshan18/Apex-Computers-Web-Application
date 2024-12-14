@@ -28,6 +28,12 @@
     height: auto;
     background: linear-gradient(180deg, #131314 0%, #1F2022 17%, #272A2D 100%);
 }
+.main-bodyContainer2 {
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(180deg, #131314 0%, #1F2022 17%, #272A2D 100%);
+    overflow-y: auto;
+}
 
 .nav-container {
     width: 100%;

@@ -19,25 +19,25 @@ const Home = () => {
     const slides = [
         {
             id: 1,
-            image: './images/collection1.png',
+            image: './images/product-images/collection1.png',
             title: 'New MacBook Pro',
             subtitle: 'Up To 40% Off in This Season',
         },
         {
             id: 2,
-            image: './images/VGA-Card.png',
+            image: './images/product-images/VGA-Card.png',
             title: 'NVIDIA RTX 4070',
             subtitle: 'Latest Gadgets Available',
         },
         {
             id: 3,
-            image: './images/headphone.png',
+            image: './images/product-images/headphone.png',
             title: 'JBL Ex7G Pro Matrix',
             subtitle: 'Grab them while stock lasts!',
         },
         {
             id: 4,
-            image: './images/collection_2.png',
+            image: './images/product-images/collection_2.png',
             title: 'Super Nova PC Build',
             subtitle: 'Best for Gamers..!',
         },
@@ -99,57 +99,6 @@ const Home = () => {
     // const [product, setProducts] = useState("");
     // top products card create......
 
-    const topProducts = [
-        {
-            pid: "1",
-            category: "Laptop",
-            image: "./images/collection1.png",
-            pr_title: "Mackbook Pro",
-            price: "429999",
-            available: "IN-STOCK",
-        },
-        {
-            pid: "2",
-            category: "Laptop",
-            image: "./images/collection_2.png",
-            pr_title: "i7 PC Build",
-            price: "219999",
-            available: "IN-STOCK",
-        },
-        {
-            pid: "3",
-            category: "Laptop",
-            image: "./images/VGA-Card.png",
-            pr_title: "NVIDIA RTX 4070",
-            price: "319999",
-            available: "OUT-STOCK",
-        },
-        {
-            pid: "4",
-            category: "Laptop",
-            image: "./images/headphone.png",
-            pr_title: "JBL Ex7G Matrix",
-            price: "32000",
-            available: "IN-STOCK",
-        },
-        {
-            pid: "5",
-            category: "Laptop",
-            image: "./images/collection_2.png",
-            pr_title: "i7 12th Gen PC Build",
-            price: "240999",
-            available: "OUT-STOCK",
-        },
-        {
-            pid: "6",
-            category: "Laptop",
-            image: "./images/collection1.png",
-            pr_title: "Asus ROG Zephyrus",
-            price: "475999",
-            available: "IN-STOCK",
-        },
-    ];
-
     const sliderRef = useRef(null);
 
     const handleScroll = (direction) => {
@@ -188,32 +137,30 @@ const Home = () => {
         },
     ];
 
-    // active products for budget packs..........
+    const loadCategory = async () => {
 
-    // const [activeProduct, setActiveProduct] = useState(null);
-    // const [direction, setAnimationDirection] = useState('');
+        const response = await fetch("http://localhost:8080/apex_comp-backend/Load_Category",
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+            }
+        );
 
-    // const productData1 = {
-    //     title: "New Brand Headphones",
-    //     desc: "High-quality sound, noise cancellation, and lightweight design.",
-    //     price: "15000",
-    //     image: "./images/headphone.png",
-    // };
+        if (response.ok) {
+            const respObj = await response.json();
+            if (respObj.success) {
+                populateDropdown(respObj.content);
+            } else {
+                console.error("No categories available.");
+            }
+        } else {
+            console.log(response);
+        }
 
-    // const productData2 = {
-    //     title: "New Sound System",
-    //     desc: "5.1 Surround sound, high bass, and easy-to-install.",
-    //     price: "35000",
-    //     image: "./images/collection_2.png",
-    // };
-
-    // const setHandleProduct = (acProduct, direction) => {
-    //     setAnimationDirection(direction);
-    //     setActiveProduct(null); // Clear current product
-    //     setTimeout(() => {
-    //         setActiveProduct(acProduct); // Set the new product after the animation
-    //     }, 300);
-    // };
+    }
 
     const brandIcons = [
         {
@@ -235,30 +182,115 @@ const Home = () => {
 
     // this area used onloading functions
 
-    // useEffect(() => {
-    //     checkSigning();
-    // }, []);
+    // const [contactInfo,setContactInfo] = useState("");
 
-    const checkSigning = async () => {
-        const response = await fetch("http://localhost:8080/Apex_Computer-Backend/CheckSignIn",
-            {
+    // const checkSigning = async () => {
+    //     const response = await fetch("http://localhost:8080/apex_comp-backend/Check_Signin",
+    //         {
+    //             method: "GET",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //             credentials: "include",
+    //         }
+    //     );
+
+    //     if (response.ok) {
+    //         const respObj = await response.json();
+    //         let contactInfo = respObj.response_dto.content;
+    //         setProfileStatus(contactInfo.first_name + " " + contactInfo.last_name);
+    //     } else {
+    //         setProfileStatus("");
+    //     }
+    // }
+
+    useEffect(() => {
+        // checkSigning();
+
+        // const userNameFromSession = sessionStorage.getItem("user_info");
+        // if (userNameFromSession) {
+        //     setContactInfo(userNameFromSession);
+        // }
+
+        loadCategory();
+        loadProducts();
+    }, []);
+
+    useEffect(() => {
+        const firstLogin = localStorage.getItem('firstLogin');
+
+        if (firstLogin === 'true') {
+            localStorage.removeItem('firstLogin');
+
+            window.location.reload();
+        }
+    }, []);
+
+    // this area used onloading functions
+
+    const populateDropdown = (categories) => {
+        const dropdown = document.querySelector('.dropdown');
+        dropdown.innerHTML = `<option className='text-medium-txt'>All Categories</option>`;
+
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.textContent = category.name;
+            dropdown.appendChild(option);
+        });
+    };
+
+    // state for set a productslist.....
+    const [topProducts, setTopProducts] = useState([]);
+
+    const loadProducts = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/apex_comp-backend/Load_AllProducts", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                 },
-            }
-        );
+                credentials: "include",
+            });
 
-        if (response.ok) {
-            const respObj = await response.json();
-            console.log(respObj);
-        } else {
-            console.log(response);
+            if (response.ok) {
+                const respObject = await response.json();
+                const products = respObject.content.map((product) => ({
+                    id: product.id,
+                    pr_title: product.title,
+                    brand: product.brand,
+                    price: product.price,
+                    qty: product.quantity,
+                    // available: product.product_status === "Available" ? "IN-STOCK" : "OUT-OF-STOCK",
+                    image: product.image,
+                    desc: product.description,
+                }));
+                setTopProducts(products);
+            } else {
+                console.error("Failed to load products:", response);
+            }
+        } catch (error) {
+            console.error("Error fetching products:", error);
         }
     }
 
+    // state for search area....
+    const [searchDetails, setSearchDetails] = useState("");
 
-    // this area used onloading functions
+    const handleBasicSearch = () => {
+        if (searchDetails.trim()) {
+            navigate(`/search-results?query=${encodeURIComponent(searchDetails)}`);
+        }
+    };
+
+    const handleProfileClick = () => {
+        const userInfo = JSON.parse(sessionStorage.getItem("user_info"));
+        if (userInfo && userInfo.id) {
+            navigate(`/my-profile/${userInfo.id}`);
+        } else {
+            alert("User not signed in!");
+        }
+    };
 
     return (
 
@@ -266,7 +298,7 @@ const Home = () => {
 
             <NavBar />
 
-            <body className='main-bodyContainer'>  {/*onLoad={checkSigning}*/}
+            <body className='main-bodyContainer'>
 
 
                 <div className='main-container'>
@@ -278,8 +310,11 @@ const Home = () => {
                             </div>
                             <div className='w-auto flex flex-row'>
                                 <div class="search-container me-5">
-                                    <input type="text" placeholder="Search..." className="search-input" />
-                                    <button class="search-button">Search</button>
+                                    <input type="text" placeholder="Search..." className="search-input"
+                                        value={searchDetails}
+                                        onChange={(e) => setSearchDetails(e.target.value)}
+                                    />
+                                    <button class="search-button" onClick={handleBasicSearch}>Search</button>
                                     {/* <Link to='/signin' className='search-button'>Go To Sign Up</Link> */}
                                 </div>
                                 <div class="icon-container">
@@ -290,9 +325,11 @@ const Home = () => {
                                 </div>
                             </div>
                             <div className=' flex flex-row items-center'>
-                                <span className='text-medium-txt text-[#CECECE] font-semibold font-[Quicksand] pe-3'>Sahan12@</span>
+                                {/* <span className='text-medium-txt text-[#CECECE] font-semibold font-[Quicksand] pe-3'>{contactInfo}</span> */}
                                 <div className='icon-box'>
-                                    <img src="./images/User.png" alt="User-Img" className='icon-view' />
+                                    <img src="./images/User.png" alt="User-Img" className='icon-view'
+                                        onClick={handleProfileClick}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -305,10 +342,10 @@ const Home = () => {
                         <div className='w-[100%] flex flex-row justify-between items-center'>
                             <div className='flex flex-row items-center'>
                                 <div className='notify-img1'>
-                                    <img src="./images/collection1.png" alt="notify1" className='notify-img-view' />
+                                    <img src="./images/product-images/collection1.png" alt="notify1" className='notify-img-view' />
                                 </div>
                                 <div className='notify-img1'>
-                                    <img src="./images/collection_2.png" alt="notify1" className='notify-img-view' />
+                                    <img src="./images/product-images/collection_2.png" alt="notify1" className='notify-img-view' />
                                 </div>
                             </div>
                             <div className='flex flex-col items-center justify-center gap-y-2'>
@@ -317,10 +354,10 @@ const Home = () => {
                             </div>
                             <div className='flex flex-row items-center'>
                                 <div className='notify-img1'>
-                                    <img src="./images/VGA-card.png" alt="notify1" className='notify-img-view' />
+                                    <img src="./images/product-images/VGA-card.png" alt="notify1" className='notify-img-view' />
                                 </div>
                                 <div className='notify-img1'>
-                                    <img src="./images/headphone.png" alt="notify1" className='notify-img-view' />
+                                    <img src="./images/product-images/headphone.png" alt="notify1" className='notify-img-view' />
                                 </div>
                             </div>
                         </div>
@@ -438,7 +475,7 @@ const Home = () => {
                             >
                                 {topProducts.map((product) => (
                                     <div
-                                        key={product.pid}
+                                        key={product.id}
                                         className="flex-shrink-0 w-[calc(20%-1rem)] bg-gradient-to-br from-[#2B3740] to-[#1F2B33] p-4 rounded-lg shadow-lg relative"
                                         style={{
                                             minWidth: "calc(20% - 1rem)", // Adjust card width dynamically
@@ -446,7 +483,7 @@ const Home = () => {
                                         }}
                                     >
                                         <span className="text-[#C2CBCE] font-normal text-[12px] block mb-2 text-right">
-                                            {product.category}
+                                            {product.brand}
                                         </span>
                                         <div className="flex flex-col items-center">
                                             <div className="card-img-area mb-4">
@@ -464,14 +501,56 @@ const Home = () => {
                                             <span className="block text-[#e1e4e5] font-medium">
                                                 Rs: {product.price}.00
                                             </span>
+
                                             <span
-                                                className={`block mt-2 font-medium ${product.available === "IN-STOCK"
-                                                    ? "text-[#4FF974]"
-                                                    : "text-[#e33d3d]"
+                                                className={`block mt-2 font-medium ${product.qty === 0
+                                                    ? "text-[#e33d3d]"
+                                                    : "text-[#4FF974]"
                                                     }`}
                                             >
-                                                {product.available}
+                                                {product.qty === 0 ? (
+                                                    "OUT-OF-STOCK"
+                                                ) : (
+                                                    "IN-STOCK"
+                                                )}
                                             </span>
+                                            <div className='flex flex-row items-center justify-between mt-6'>
+                                                {product.qty === 0 ? (
+                                                    <button className='text-white bg-green-800 rounded-md border-none px-4 py-1'
+                                                        disabled={true}
+                                                    // onClick={() => navigate(`/SingleProductView`, { state: { product } })}
+                                                    >buy now</button>
+                                                ) : (
+                                                    <button className='text-white bg-green-600 rounded-md border-none px-4 py-1'
+                                                        onClick={() => navigate(`/SingleProductView`, { state: { product } })}
+                                                    >buy now</button>
+                                                )}
+
+
+                                                <svg xmlns="http://www.w3.org/2000/svg" className='w-6 h-6 cursor-pointer' viewBox="0 0 24 24"
+                                                    onClick={
+                                                        async () => {
+                                                            const response = await fetch(`http://localhost:8080/apex_comp-backend/AddToCart?pid=${product.id}&qty=${product.qty}`,
+                                                                {
+                                                                    method: "GET",
+                                                                    headers: {
+                                                                        "Content-Type": "application/json",
+                                                                    },
+                                                                    credentials: "include",
+                                                                }
+                                                            );
+
+                                                            if (response.ok) {
+                                                                const responseObj = await response.json();
+                                                                console.log(responseObj);
+                                                            } else {
+                                                                console.log(response);
+                                                            }
+                                                        }
+                                                    }
+                                                ><g fill="none" stroke="#ff0" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5"><path fill="#ff0" d="M19.5 22a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3m-10 0a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3" /><path d="M5 4h17l-2 11H7zm0 0c-.167-.667-1-2-3-2m18 13H5.23c-1.784 0-2.73.781-2.73 2s.946 2 2.73 2H19.5" /></g></svg>
+
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -493,7 +572,7 @@ const Home = () => {
                 <div className='main-container'>
                     <div className='w-[95%] my-[3%] py-[1%] h-auto flex flex-row justify-between items-center bg-[#3A4549] rounded-md px-[1%]'>
                         <div className='colImg1-box'>
-                            <img src="./images/tuf_G1.png" className='colImg-view' alt="" />
+                            <img src="./images/product-images/tuf_G1.png" className='colImg-view' alt="" />
                         </div>
                         <div className='flex flex-col items-center justify-center gap-y-1'>
                             <span className='text-[#97E6FF] font-[Inter] text-heading-txt'>NEW COLLECTION</span>
@@ -502,7 +581,7 @@ const Home = () => {
                             <button className='bg-[#7CCBDC] py-[6px] px-[15px] rounded-md mt-4 font-medium'>Shop Now</button>
                         </div>
                         <div className='colImg1-box'>
-                            <img src="./images/tuf_G2.png" className='colImg-view' alt="" />
+                            <img src="./images/product-images/tuf_G2.png" className='colImg-view' alt="" />
                         </div>
                     </div>
                 </div>
@@ -535,7 +614,7 @@ const Home = () => {
 
                             <div className='w-[25%] h-[340px] flex flex-col bg-[#3A4549] rounded-md'>
                                 <div className='w-[100%] h-[100%]'>
-                                    <img src="./images/g_headphone.png" className='w-[100%] h-[100%] relative z-0' style={{ backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundSize: 'cover' }} alt="" />
+                                    <img src="./images/product-images/g_headphone.png" className='w-[100%] h-[100%] relative z-0' style={{ backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundSize: 'cover' }} alt="" />
                                 </div>
                                 <div className='absolute h-[100%] p-[1.5%] flex flex-col z-10 justify-between'>
                                     <span className='text-[#A1DAEC] text-subHeading-txt font-semibold font-[Inter]'>Brand New Headphone</span>
@@ -549,7 +628,7 @@ const Home = () => {
                             </div>
                             <div className='w-[50%] h-[340px] p-[2%] flex flex-row justify-center items-center bg-[#18414b] rounded-md' style={{ border: '1px solid #50818C' }}>
                                 <div className='w-[45%] h-[300px] object-cover'>
-                                    <img src="./images/Collection_2.png" className='w-[100%] h-[100%]' style={{ backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundSize: 'cover' }} alt="" />
+                                    <img src="./images/product-images/Collection_2.png" className='w-[100%] h-[100%]' style={{ backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundSize: 'cover' }} alt="" />
                                 </div>
                                 <div className='w-[55%] flex flex-col gap-y-2 justify-center'>
                                     <span className='text-[#9FE8FF] text-subHeading-txt font-[Inter] font-medium mb-[2%]'>Monthly Budget Pack</span>
@@ -570,7 +649,7 @@ const Home = () => {
                             </div>
                             <div className='w-[25%] h-[340px] flex flex-col bg-[#3A4549] rounded-md'>
                                 <div className='w-[100%] h-[100%]'>
-                                    <img src="./images/SSD2.png" className='w-[100%] h-[100%] relative z-0' style={{ backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundSize: 'cover' }} alt="" />
+                                    <img src="./images/product-images/SSD2.png" className='w-[100%] h-[100%] relative z-0' style={{ backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundSize: 'cover' }} alt="" />
                                 </div>
                                 <div className='absolute h-[100%] p-[1.5%] flex flex-col z-10 justify-between'>
                                     <span className='text-[#A1DAEC] text-subHeading-txt font-semibold font-[Inter]'>Brand New SSD</span>
