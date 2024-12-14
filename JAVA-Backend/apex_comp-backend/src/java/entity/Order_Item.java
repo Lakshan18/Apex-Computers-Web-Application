@@ -22,6 +22,9 @@ public class Order_Item implements Serializable {
     @Column(name = "qty", nullable = false)
     private int quantity;
 
+    @Column(name = "total", nullable = false)
+    private double total;
+
     @ManyToOne
     @JoinColumn(name = "orders_id", nullable = false)
     private Orders order;
@@ -48,6 +51,14 @@ public class Order_Item implements Serializable {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
     }
 
     public Orders getOrder() {

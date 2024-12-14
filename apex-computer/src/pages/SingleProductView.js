@@ -4,6 +4,29 @@ import NavBar from '../components/NavBar';
 import { useLocation } from 'react-router-dom';
 
 function SingleProductView() {
+
+    useEffect(() => {
+        const script = document.createElement('script');
+        script.src = "https://www.payhere.lk/lib/payhere.js";
+        script.onload = () => {
+            if (window.payhere) {
+                window.payhere.onCompleted = function onCompleted(orderId) {
+                    console.log("Payment completed. OrderID:" + orderId);
+                };
+                window.payhere.onDismissed = function onDismissed() {
+                    console.log("Payment dismissed");
+                };
+                window.payhere.onError = function onError(error) {
+                    console.log("Error:" + error);
+                };
+            }
+        };
+        script.onerror = () => {
+            console.error("Error loading PayHere script");
+        };
+        document.body.appendChild(script);
+    }, []);
+
     const [cities, setCities] = useState([]);
     const [selectedQuantity, setSelectedQuantity] = useState(1);
     const [totalPrice, setTotalPrice] = useState(0);
@@ -251,7 +274,35 @@ function SingleProductView() {
 
                                         if (response.ok) {
                                             const respObj = await response.json();
-                                            console.log("Checkout success:", respObj);
+                                            const responseValues = respObj.payhereJson;
+
+                                            var payment = {
+                                                "sandbox": true,
+                                                "merchant_id": responseValues.merchant_id,    // Replace your Merchant ID
+                                                "return_url": undefined,     // Important
+                                                "cancel_url": undefined,     // Important
+                                                "notify_url": "",
+                                                "order_id": responseValues.order_id,
+                                                "items": responseValues.items,
+                                                "amount": responseValues.amount,
+                                                "currency": "LKR",
+                                                "hash": responseValues.hash, // *Replace with generated hash retrieved from backend
+                                                "first_name": responseValues.first_name,
+                                                "last_name": responseValues.last_name,
+                                                "email": responseValues.email,
+                                                "phone": "",
+                                                "address": "",
+                                                "city": "",
+                                                "country": "",
+                                                "delivery_address": responseValues.delivery_ads,
+                                                "delivery_city": "",
+                                                "delivery_country": "",
+                                                "custom_1": "",
+                                                "custom_2": ""
+                                            };
+
+                                            window.payhere.startPayment(payment);
+
                                         } else {
                                             console.error("Checkout failed:", response);
                                         }

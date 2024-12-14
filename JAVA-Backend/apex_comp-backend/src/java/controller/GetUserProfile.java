@@ -46,6 +46,7 @@ public class GetUserProfile extends HttpServlet {
             User user = (User) userCriteria.uniqueResult();
 
             if (user != null) {
+                jsonObject.addProperty("uid", user.getId());
                 jsonObject.addProperty("email", user.getEmail());
                 jsonObject.addProperty("fName", user.getFirst_name());
                 jsonObject.addProperty("lName",user.getLast_name());

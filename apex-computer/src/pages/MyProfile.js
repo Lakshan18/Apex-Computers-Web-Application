@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 const MyProfile = () => {
     const { userId } = useParams();
     const [user_objectData, setUser_ObjectData] = useState("");
+
     const fetchUserData = async () => {
         const response = await fetch(`http://localhost:8080/apex_comp-backend/GetUserProfile?id=${userId}`,
             {
@@ -20,6 +21,7 @@ const MyProfile = () => {
         if (response.ok) {
             const respObj = await response.json();
             const userObject = {
+                u_id: respObj.uid,
                 email: respObj.email,
                 username: respObj.username,
                 fName: respObj.fName,
@@ -32,6 +34,25 @@ const MyProfile = () => {
             };
 
             setUser_ObjectData(userObject);
+        } else {
+            console.error(response);
+        }
+    }
+
+    const fetchOrderHistory = async () => {
+        const response = await fetch(`http://localhost:8080/apex_comp-backend/FetchOrderHistory?uid=${userId}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",
+            }
+        );
+
+        if (response.ok) {
+            const respObj = await response.json();
+            console.log(respObj);
         } else {
             console.error(response);
         }
@@ -159,7 +180,7 @@ const MyProfile = () => {
 
                 {/* Order History */}
                 <div className="w-full max-w-4xl bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h2 className="text-xl font-semibold border-b border-gray-700 pb-2 mb-4">Order History</h2>
+                    <h2 className="text-xl font-semibold border-b border-gray-700 pb-2 mb-4" onClick={fetchOrderHistory}>Order History</h2>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-gray-300">
                             <thead>
