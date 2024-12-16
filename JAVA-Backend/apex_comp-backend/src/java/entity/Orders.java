@@ -30,6 +30,10 @@ public class Orders implements Serializable {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+    
+    public Orders(){
+        
+    }
 
     public int getId() {
         return id;

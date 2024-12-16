@@ -43,15 +43,12 @@ public class LoadCartItems extends HttpServlet {
         try {
 
             if (httpSession.getAttribute("user") != null) {
-                // DB cart.....
                 User_DTO user_DTO = (User_DTO) httpSession.getAttribute("user");
 
-                // search user
                 Criteria criteria1 = session.createCriteria(User.class);
                 criteria1.add(Restrictions.eq("email", user_DTO.getEmail()));
                 User user = (User) criteria1.uniqueResult();
 
-                // search cart items for the user
                 Criteria criteria2 = session.createCriteria(Cart.class);
                 criteria2.add(Restrictions.eq("user", user));
                 List<Cart> cartList = criteria2.list();
@@ -63,16 +60,14 @@ public class LoadCartItems extends HttpServlet {
                     Product product = cart.getProduct();
                     product.setAdmin(null);
 
-                    // Set the product image URL
-                    String imageUrl = imageBasePath + product.getId() + ".png"; // Assuming 'getImage' returns the image file name
+                    String imageUrl = imageBasePath + product.getId() + ".png"; 
                     cart_DTO.setProduct(product);
                     cart_DTO.setQty(cart.getQuantity());
-                    cart_DTO.setImage(imageUrl);  // Set the image URL in DTO
+                    cart_DTO.setImage(imageUrl); 
 
                     cartDtoList.add(cart_DTO);
                 }
             } else {
-                // Session Cart
                 System.out.println("session cart");
 
                 if (httpSession.getAttribute("sessionCart") != null) {

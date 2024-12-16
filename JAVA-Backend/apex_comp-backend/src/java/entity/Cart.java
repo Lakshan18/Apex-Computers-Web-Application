@@ -29,6 +29,10 @@ public class Cart implements Serializable {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     Product product;
+    
+    public Cart(){
+        
+    }
 
     public int getId() {
         return id;

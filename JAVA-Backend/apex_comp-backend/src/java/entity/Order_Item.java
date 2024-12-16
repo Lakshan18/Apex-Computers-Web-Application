@@ -36,6 +36,10 @@ public class Order_Item implements Serializable {
     @ManyToOne
     @JoinColumn(name = "order_status_id", nullable = false)
     private Order_Status order_status;
+    
+    public Order_Item(){
+        
+    }
 
     public int getId() {
         return id;

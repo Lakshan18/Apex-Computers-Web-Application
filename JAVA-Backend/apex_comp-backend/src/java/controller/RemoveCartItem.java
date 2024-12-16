@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import model.HibernateUtil;
 import model.SetCores;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
@@ -43,9 +42,7 @@ public class RemoveCartItem extends HttpServlet {
         } catch (NumberFormatException e) {
             response_dto.setSuccess(false);
             response_dto.setContent("Invalid product ID.");
-
-            resp.setContentType("application/json");
-            resp.getWriter().write(gson.toJson(response_dto));
+            sendResponse(resp, gson, response_dto);
             return;
         }
 
@@ -53,17 +50,16 @@ public class RemoveCartItem extends HttpServlet {
         Transaction transaction = null;
 
         try {
+            User user = null;
             if (httpSession.getAttribute("user") != null) {
-                transaction = session.beginTransaction();
-
-                User user = (User) session.createCriteria(User.class)
-                        .add(Restrictions.eq("email", ((dto.User_DTO) httpSession.getAttribute("user")).getEmail()))
+                String email = ((dto.User_DTO) httpSession.getAttribute("user")).getEmail();
+                user = (User) session.createCriteria(User.class)
+                        .add(Restrictions.eq("email", email))
                         .uniqueResult();
+            }
 
-                if (user == null) {
-                    throw new Exception("User not found.");
-                }
-
+            if (user != null) {
+                transaction = session.beginTransaction();
                 Cart cartItem = (Cart) session.createCriteria(Cart.class)
                         .add(Restrictions.eq("user", user))
                         .add(Restrictions.eq("product.id", productId))
@@ -78,27 +74,24 @@ public class RemoveCartItem extends HttpServlet {
                     response_dto.setSuccess(false);
                     response_dto.setContent("Item not found in the cart.");
                 }
-
             } else {
                 if (httpSession.getAttribute("sessionCart") != null) {
                     ArrayList<Cart_DTO> cartDtoList = (ArrayList<Cart_DTO>) httpSession.getAttribute("sessionCart");
                     boolean itemRemoved = cartDtoList.removeIf(cartDto -> cartDto.getProduct().getId() == productId);
 
                     if (itemRemoved) {
+                        httpSession.setAttribute("sessionCart", cartDtoList);
                         response_dto.setSuccess(true);
                         response_dto.setContent("Item removed successfully.");
                     } else {
                         response_dto.setSuccess(false);
                         response_dto.setContent("Item not found in the cart.");
                     }
-
-                    httpSession.setAttribute("sessionCart", cartDtoList);
                 } else {
                     response_dto.setSuccess(false);
                     response_dto.setContent("Cart is empty.");
                 }
             }
-
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
@@ -110,6 +103,10 @@ public class RemoveCartItem extends HttpServlet {
             session.close();
         }
 
+        sendResponse(resp, gson, response_dto);
+    }
+
+    private void sendResponse(HttpServletResponse resp, Gson gson, Response_DTO response_dto) throws IOException {
         resp.setContentType("application/json");
         resp.getWriter().write(gson.toJson(response_dto));
     }

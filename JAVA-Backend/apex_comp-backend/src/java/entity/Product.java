@@ -58,6 +58,10 @@ public class Product implements Serializable {
     @ManyToOne
     @JoinColumn(name = "admin_id", nullable = false)
     private Admin admin;
+    
+    public Product(){
+        
+    }
 
     public int getId() {
         return id;

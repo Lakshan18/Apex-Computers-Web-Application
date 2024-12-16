@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 const MyProfile = () => {
     const { userId } = useParams();
     const [user_objectData, setUser_ObjectData] = useState("");
+    const [orderHistory, setOrderHistory] = useState([]);
 
     const fetchUserData = async () => {
         const response = await fetch(`http://localhost:8080/apex_comp-backend/GetUserProfile?id=${userId}`,
@@ -52,7 +53,9 @@ const MyProfile = () => {
 
         if (response.ok) {
             const respObj = await response.json();
-            console.log(respObj);
+            if (respObj.success) {
+                setOrderHistory(respObj.orders);
+            }
         } else {
             console.error(response);
         }
@@ -60,8 +63,46 @@ const MyProfile = () => {
 
     useEffect(() => {
         fetchUserData();
+        fetchOrderHistory();
     }, [userId]);
 
+    const updateProfile = async () => {
+        const updatedProfile = {
+            userId: userId,
+            fName: user_objectData.fName,
+            lName: user_objectData.lName,
+            username: user_objectData.username,
+            mobile: user_objectData.mobile,
+            line1: user_objectData.line1,
+            line2: user_objectData.line2,
+            city: user_objectData.city,
+            postalC: user_objectData.postalC,
+        };
+    
+        const response = await fetch("http://localhost:8080/apex_comp-backend/EditProfile", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify(updatedProfile),
+        });
+    
+        if (response.ok) {
+            const result = await response.json();
+            console.log(result);
+            if (result.success) {
+                alert("Profile updated successfully!");
+                fetchUserData(); // Refresh profile data
+            } else {
+                alert("Failed to update profile: " + result.message);
+            }
+        } else {
+            console.error("Error updating profile:", response);
+            alert("An error occurred while updating the profile.");
+        }
+    };
+    
 
     return (
         <>
@@ -80,7 +121,7 @@ const MyProfile = () => {
                             <p className="text-teal-400">{user_objectData.email}</p>
                         </div>
                     </div>
-                    <button className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600">Edit Profile</button>
+                    <button className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600" onClick={updateProfile}>Edit Profile</button>
                 </div>
 
                 {/* Profile Details */}
@@ -180,7 +221,7 @@ const MyProfile = () => {
 
                 {/* Order History */}
                 <div className="w-full max-w-4xl bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h2 className="text-xl font-semibold border-b border-gray-700 pb-2 mb-4" onClick={fetchOrderHistory}>Order History</h2>
+                    <h2 className="text-xl font-semibold border-b border-gray-700 pb-2 mb-4">Order History</h2>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-gray-300">
                             <thead>
@@ -192,18 +233,31 @@ const MyProfile = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr className="border-t border-gray-700 hover:bg-gray-700">
-                                    <td className="p-3">#12345</td>
-                                    <td className="p-3">2024-12-10</td>
-                                    <td className="p-3">$299.99</td>
-                                    <td className="p-3 text-teal-500">Delivered</td>
-                                </tr>
-                                <tr className="border-t border-gray-700 hover:bg-gray-700">
-                                    <td className="p-3">#12344</td>
-                                    <td className="p-3">2024-12-08</td>
-                                    <td className="p-3">$149.99</td>
-                                    <td className="p-3 text-yellow-400">Pending</td>
-                                </tr>
+                                {orderHistory.length > 0 ? (
+                                    orderHistory.map((order) => (
+                                        <tr key={order.orderId} className="border-t border-gray-700 hover:bg-gray-700">
+                                            <td className="p-3">#{order.orderId}</td>
+                                            <td className="p-3">{new Date(order.dateTime).toLocaleDateString()}</td>
+                                            <td className="p-3">${order.total.toFixed(2)}</td>
+                                            <td
+                                                className={`p-3 ${order.orderStatus === "Delivered"
+                                                        ? "text-teal-500"
+                                                        : order.orderStatus === "Pending"
+                                                            ? "text-yellow-400"
+                                                            : "text-red-500"
+                                                    }`}
+                                            >
+                                                {order.orderStatus}
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="4" className="p-3 text-center">
+                                            No orders found.
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>

@@ -25,6 +25,10 @@ public class Admin implements Serializable {
     
     @Column(name = "password",length = 10,nullable = false)
     private String password;
+    
+    public Admin(){
+        
+    }
 
     public int getId() {
         return id;

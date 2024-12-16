@@ -19,6 +19,10 @@ public class Order_Status implements Serializable {
 
     @Column(name = "name", length = 15, nullable = false)
     private String name;
+    
+    public Order_Status(){
+        
+    }
 
     public int getId() {
         return id;

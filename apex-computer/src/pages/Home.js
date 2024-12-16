@@ -321,7 +321,7 @@ const Home = () => {
                                     <div class="shopping-icon cursor-pointer" onClick={goToCart}>
                                         <img src="./images/shopping.png" alt="shopping-icon" className='cart-icon-view' />
                                     </div>
-                                    <div class="badge">3</div>
+                                    {/* <div class="badge">3</div> */}
                                 </div>
                             </div>
                             <div className=' flex flex-row items-center'>
@@ -375,7 +375,7 @@ const Home = () => {
                                     <a href="#a" className='text-medium-txt font-[Roboto] text-[#FFFFFF]'>Top Products</a>
                                 </div>
                                 <div className='nav-item'>
-                                    <a href="#s" className='text-medium-txt font-[Roboto] text-[#FFFFFF]'>Top Products</a>
+                                    <a href="#s" className='text-medium-txt font-[Roboto] text-[#FFFFFF]'>Best Products</a>
                                 </div>
                                 <div className='nav-item'>
                                     <a href="#a" className='text-medium-txt font-[Roboto] text-[#FFFFFF]'>Blogs</a>
@@ -522,7 +522,16 @@ const Home = () => {
                                                     >buy now</button>
                                                 ) : (
                                                     <button className='text-white bg-green-600 rounded-md border-none px-4 py-1'
-                                                        onClick={() => navigate(`/SingleProductView`, { state: { product } })}
+                                                        onClick={
+                                                            () => {
+                                                                const userInfo = JSON.parse(sessionStorage.getItem("user_info"));
+                                                                if (userInfo && userInfo.id) {
+                                                                    navigate(`/SingleProductView`, { state: { product } })
+                                                                } else {
+                                                                    alert("user not sign in.");
+                                                                }
+                                                            }
+                                                        }
                                                     >buy now</button>
                                                 )}
 
@@ -542,7 +551,11 @@ const Home = () => {
 
                                                             if (response.ok) {
                                                                 const responseObj = await response.json();
-                                                                console.log(responseObj);
+                                                                if(responseObj.success){
+                                                                   alert("Product added to the cart.");
+                                                                }else{
+                                                                    alert("This product in already added!");
+                                                                }
                                                             } else {
                                                                 console.log(response);
                                                             }

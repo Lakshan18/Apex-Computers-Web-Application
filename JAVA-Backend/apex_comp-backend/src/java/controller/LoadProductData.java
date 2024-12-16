@@ -7,11 +7,14 @@ import com.google.gson.JsonObject;
 import dto.Response_DTO;
 import entity.Brand;
 import entity.Category;
+import entity.Color;
 import entity.Model;
+import entity.Product;
 import model.HibernateUtil;
 import model.SetCores;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -40,32 +43,61 @@ public class LoadProductData extends HttpServlet {
         JsonObject jsonResponse = new JsonObject();
 
         try {
-            // Fetch Category Names
+            // Fetch Category Data
             Criteria categoryCriteria = session.createCriteria(Category.class);
             List<Category> categories = categoryCriteria.list();
-            JsonArray categoryNames = new JsonArray();
+            JsonArray categoryArray = new JsonArray();
             for (Category category : categories) {
-                categoryNames.add(category.getName()); // Assuming `getName()` exists in the Category entity
+                JsonObject categoryObj = new JsonObject();
+                categoryObj.addProperty("catId", category.getId());
+                categoryObj.addProperty("catName", category.getName());
+                categoryArray.add(categoryObj);
             }
-            jsonResponse.add("categories", categoryNames);
+            jsonResponse.add("categories", categoryArray);
 
-            // Fetch Brand Names
+            // Fetch Brand Data
             Criteria brandCriteria = session.createCriteria(Brand.class);
             List<Brand> brands = brandCriteria.list();
-            JsonArray brandNames = new JsonArray();
+            JsonArray brandArray = new JsonArray();
             for (Brand brand : brands) {
-                brandNames.add(brand.getName()); // Assuming `getName()` exists in the Brand entity
+                JsonObject brandObj = new JsonObject();
+                brandObj.addProperty("brdId", brand.getId());
+                brandObj.addProperty("brdName", brand.getName());
+                brandArray.add(brandObj);
             }
-            jsonResponse.add("brands", brandNames);
+            jsonResponse.add("brands", brandArray);
 
-            // Fetch Model Names
+            // Fetch Model Data
             Criteria modelCriteria = session.createCriteria(Model.class);
             List<Model> models = modelCriteria.list();
-            JsonArray modelNames = new JsonArray();
+            JsonArray modelArray = new JsonArray();
             for (Model model : models) {
-                modelNames.add(model.getName()); // Assuming `getName()` exists in the Model entity
+                JsonObject modelObj = new JsonObject();
+                modelObj.addProperty("modId", model.getId());
+                modelObj.addProperty("modName", model.getName());
+                modelArray.add(modelObj);
             }
-            jsonResponse.add("models", modelNames);
+            jsonResponse.add("models", modelArray);
+
+            // Fetch Color Data
+            Criteria colorCriteria = session.createCriteria(Color.class);
+            List<Color> colors = colorCriteria.list();
+            JsonArray colorArray = new JsonArray();
+            for (Color color : colors) {
+                JsonObject colorObj = new JsonObject();
+                colorObj.addProperty("colId", color.getId());
+                colorObj.addProperty("colName", color.getName());
+                colorArray.add(colorObj);
+            }
+            jsonResponse.add("colors", colorArray);
+
+            // Fetch Next Product ID
+            Criteria productCriteria = session.createCriteria(Product.class);
+            productCriteria.addOrder(Order.desc("id"));
+            productCriteria.setMaxResults(1);
+            Product latestProduct = (Product) productCriteria.uniqueResult();
+            int nextPid = (latestProduct != null) ? latestProduct.getId() + 1 : 1; 
+            jsonResponse.addProperty("pid", nextPid);
 
             response_dto.setSuccess(true);
             response_dto.setContent(jsonResponse);
